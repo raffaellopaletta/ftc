@@ -29,9 +29,7 @@ class TextClassifier:
         for category in self.documents.keys():
             similarities[category] = self.similarity(fs, category)
 
-        #print(similarities)
         ret = dict( sorted(similarities.items(), key=operator.itemgetter(0), reverse=True))
-        #print(ret)
         out = []
 
         for k, v in ret.items():

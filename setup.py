@@ -1,14 +1,22 @@
-from setuptools import setup
+import setuptools
 
-setup(name='fuzzy_text_classifier',
-      version='0.1',
-      description='A fuzzy classifier library for natural language text',
-      url='https://github.com/raffaellopaletta/ftc',
-      author='Raffaello Paletta',
-      author_email='raffaellopaletta@gmail.com',
-      license='MIT',
-      packages=['fuzzy_text_classifier'],
-      install_requires=[
-            'typing'
-      ],
-      zip_safe=False)
+with open("README.md", "r") as fh:
+    long_description = fh.read()
+
+setuptools.setup(
+    name="fuzzy-text-classifier",
+    version="0.0.1",
+    author="Raffaello Paletta",
+    author_email="raffaellopaletta@gmail.com",
+    description="A fuzzy classifier for natural language text",
+    long_description=long_description,
+    long_description_content_type="text/markdown",
+    url="https://github.com/raffaellopaletta/ftc",
+    packages=setuptools.find_packages(),
+    classifiers=[
+        "Programming Language :: Python :: 3",
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: OS Independent",
+    ],
+    python_requires='>=3.6',
+)
