@@ -85,5 +85,3 @@ class TestTextClassifier:
         keys = list(ranking[0])
         assert keys[0] == 'cat1'
 
-
-

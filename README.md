@@ -19,17 +19,17 @@ doc2 = 'another text document about cinema'
 doc3 = 'another one text document music'
 
 tc.train(doc1, 'sport')
-tc.train(doc1, 'cinema')
-tc.train(doc1, 'music')
+tc.train(doc2, 'cinema')
+tc.train(doc3, 'music')
 
 #classify a document
-doc = 'a document to classify'
+doc = 'a document about sport to classify'
 ranking = tc.classify(doc)
 ```
 
 ranking** will be an object like 
 
-`[{'sport': 0.95}, {'cinema': 0.3}, {'music': 0.2}]
+`[{'sport': 1.0}, {'cinema': 0.6666666666666666}, {'music': 0.3333333333333333}]
 `
 
 a list ordered by similarity where the key is the category and the value is the degree of similarity between 

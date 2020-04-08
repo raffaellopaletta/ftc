@@ -41,7 +41,11 @@ class TextClassifier:
         for category in self.documents.keys():
             similarities[category] = similarities[category]/max_sim
 
-        ret = dict(sorted(similarities.items(), key = operator.itemgetter(0)))
+        ret = {k: v for k, v in sorted(similarities.items(), reverse=True, key=lambda key: key[1])}
+
+        #print(similarities)
+
+        #ret = dict(sorted(similarities.items(), key = operator.itemgetter(0), reverse = True))
         out = []
 
         for k, v in ret.items():
