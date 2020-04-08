@@ -3,12 +3,17 @@ from collections import defaultdict
 from .FuzzySet import FuzzySet
 from .Tnorm import Tnorm
 from .Snorm import Snorm
+from .AbstractTokenizer import AbstractTokenizer
 import operator
 
 
 class TextClassifier:
 
-    def __init__(self, tokenizer=None):
+    def __init__(self, tokenizer: AbstractTokenizer = None):
+
+        if tokenizer is not None and not isinstance(tokenizer, AbstractTokenizer):
+            raise ValueError('instance of AbstractTokenizer required')
+
         self.tokenizer = tokenizer
         self.documents = defaultdict(list)
 
@@ -23,13 +28,20 @@ class TextClassifier:
     def classify(self, text: str) -> dict:
 
         similarities = {}
+        sims = []
 
         fs = self.fuzzyfy(self.tokenize(text))
 
         for category in self.documents.keys():
             similarities[category] = self.similarity(fs, category)
+            sims.append(similarities[category])
 
-        ret = dict( sorted(similarities.items(), key=operator.itemgetter(0), reverse=True))
+        max_sim = max(sims)
+
+        for category in self.documents.keys():
+            similarities[category] = similarities[category]/max_sim
+
+        ret = dict(sorted(similarities.items(), key = operator.itemgetter(0)))
         out = []
 
         for k, v in ret.items():
@@ -99,8 +111,10 @@ class TextClassifier:
         denominator = 0
 
         for term in doc.terms:
-            numerator += Tnorm.einstein(self.__r(term, category), doc.terms.get(term, 0))
-            denominator += Snorm.einstein(self.__r(term, category), doc.terms.get(term, 0))
+            r = self.__r(term, category)
+            s = doc.terms.get(term, 0)
+            numerator += Tnorm.einstein(r, s)
+            denominator += Snorm.einstein(r, s)
 
         if denominator == 0:
             return 0
