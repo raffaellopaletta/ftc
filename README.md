@@ -27,7 +27,7 @@ doc = 'a document about sport to classify'
 ranking = tc.classify(doc)
 ```
 
-ranking** will be an object like 
+**ranking** will be an object like 
 
 `[{'sport': 1.0}, {'cinema': 0.6666666666666666}, {'music': 0.3333333333333333}]
 `
