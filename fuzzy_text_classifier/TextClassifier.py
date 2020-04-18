@@ -25,24 +25,21 @@ class TextClassifier:
         fs = self.fuzzyfy(self.tokenize(text))
         self.documents[category].append(fs)
 
-    def classify(self, text: str) -> dict:
+    def classify(self, text: str) -> []:
 
         similarities = {}
-        sims = []
+        max_sim = 0
 
         fs = self.fuzzyfy(self.tokenize(text))
 
         for category in self.documents.keys():
             similarities[category] = self.similarity(fs, category)
-            sims.append(similarities[category])
+            if similarities[category] > max_sim:
+                max_sim = similarities[category]
 
-        max_sim = max(sims)
-
-        for category in self.documents.keys():
-            if max_sim > 0:
+        if max_sim > 0:
+            for category in self.documents.keys():
                 similarities[category] = similarities[category] / max_sim
-            else:
-                similarities[category] = 0
 
         ret = {k: v for k, v in sorted(similarities.items(), reverse=True, key=lambda key: key[1])}
 
@@ -98,12 +95,12 @@ class TextClassifier:
     def __r(self, term: str, category: str):
 
         numerator = self.__dist(term, category)
-        dists = []
+        denominator = 0
 
         for cat in self.documents.keys():
-            dists.append(self.__dist(term, cat))
-
-        denominator = max(dists)
+            dist = self.__dist(term, cat)
+            if dist > denominator:
+                denominator = dist
 
         if denominator == 0:
             return 0
