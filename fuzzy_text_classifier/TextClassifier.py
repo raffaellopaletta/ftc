@@ -4,7 +4,6 @@ from .FuzzySet import FuzzySet
 from .Tnorm import Tnorm
 from .Snorm import Snorm
 from .AbstractTokenizer import AbstractTokenizer
-import operator
 
 
 class TextClassifier:
