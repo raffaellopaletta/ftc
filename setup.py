@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="fuzzy-text-classifier",
-    version="1.1.0",
+    version="1.2.0",
     author="Raffaello Paletta",
     author_email="raffaellopaletta@gmail.com",
     description="A fuzzy classifier for natural language text",
