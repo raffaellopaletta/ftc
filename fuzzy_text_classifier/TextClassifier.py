@@ -59,9 +59,9 @@ class TextClassifier:
         terms = {}
 
         for word in words:
-            if word in terms:
+            try:
                 terms[word] += 1
-            else:
+            except KeyError:
                 terms[word] = 1
 
         maximum_key = max(terms, key=terms.get)
@@ -74,20 +74,20 @@ class TextClassifier:
 
     def __dist(self, term: str, category: str):
 
-        numerator = 0
-        denominator = 0
+        numerators = []
+        denominators = []
 
         for doc in self.documents[category]:
-            numerator += doc.terms.get(term, 0)
+            numerators.append(doc.terms.get(term, 0))
 
         for docs in self.documents.values():
             for doc in docs:
-                denominator += doc.terms.get(term, 0)
+                denominators.append(doc.terms.get(term, 0))
 
-        if denominator == 0:
+        try:
+            return sum(numerators)/sum(denominators)
+        except ZeroDivisionError:
             return 0
-
-        return numerator/denominator
 
     def __r(self, term: str, category: str):
 
@@ -99,22 +99,22 @@ class TextClassifier:
             if dist > denominator:
                 denominator = dist
 
-        if denominator == 0:
+        try:
+            return numerator / denominator
+        except ZeroDivisionError:
             return 0
 
-        return numerator/denominator
-
     def similarity(self, doc: FuzzySet, category: str):
-        numerator = 0
-        denominator = 0
+        numerators = []
+        denominators = []
 
         for term in doc.terms:
             r = self.__r(term, category)
             s = doc.terms.get(term, 0)
-            numerator += Tnorm.einstein(r, s)
-            denominator += Snorm.einstein(r, s)
+            numerators.append(Tnorm.einstein(r, s))
+            denominators.append(Snorm.einstein(r, s))
 
-        if denominator == 0:
+        try:
+            return abs(sum(numerators)/sum(denominators))
+        except ZeroDivisionError:
             return 0
-
-        return abs(numerator/denominator)
