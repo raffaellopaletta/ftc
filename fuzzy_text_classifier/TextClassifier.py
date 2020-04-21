@@ -4,6 +4,7 @@ from .FuzzySet import FuzzySet
 from .Tnorm import Tnorm
 from .Snorm import Snorm
 from .AbstractTokenizer import AbstractTokenizer
+import operator
 
 
 class TextClassifier:
@@ -26,24 +27,15 @@ class TextClassifier:
 
     def classify(self, text: str) -> []:
 
-        similarities = {}
-        max_sim = 0
-
         fs = self.fuzzyfy(self.tokenize(text))
 
-        for category in self.documents.keys():
-            similarities[category] = self.similarity(fs, category)
-            if similarities[category] > max_sim:
-                max_sim = similarities[category]
+        similarities = {cat: self.similarity(fs, cat) for cat in self.documents.keys()}
+        max_sim = max(similarities.items(), key=operator.itemgetter(1))[1]
 
         if max_sim > 0:
-            for category in self.documents.keys():
-                similarities[category] = similarities[category] / max_sim
+            similarities = {cat: similarities[cat]/max_sim for cat in similarities.keys()}
 
-        out = []
-
-        for k, v in sorted(similarities.items(), reverse=True, key=lambda key: key[1]):
-            out.append({k: v})
+        out = [{k: v for k, v in sorted(similarities.items(), reverse=True, key=lambda key: key[1])}]
 
         return out
 
@@ -59,26 +51,16 @@ class TextClassifier:
         c = Counter(words)
         maximum_value = c.most_common(1)[0][1]
         d = dict(c)
-        terms = {k:round(d[k]/maximum_value,2) for k in d}
+        terms = {k: round(d[k]/maximum_value, 2) for k in d}
         return FuzzySet(terms)
 
     def __dist(self, term: str, category: str):
 
-        numerators = []
+        numerators = [doc.terms[term] for doc in self.documents[category]]
         denominators = []
 
-        for doc in self.documents[category]:
-            try:
-                numerators.append(doc.terms[term])
-            except KeyError:
-                pass
-
         for docs in self.documents.values():
-            for doc in docs:
-                try:
-                    denominators.append(doc.terms[term])
-                except KeyError:
-                    pass
+            denominators = [doc.terms[term] for doc in docs]
 
         try:
             return sum(numerators)/sum(denominators)
@@ -88,12 +70,7 @@ class TextClassifier:
     def __r(self, term: str, category: str):
 
         numerator = self.__dist(term, category)
-        denominator = 0
-
-        for cat in self.documents.keys():
-            dist = self.__dist(term, cat)
-            if dist > denominator:
-                denominator = dist
+        denominator = max([self.__dist(term, cat) for cat in self.documents.keys()])
 
         try:
             return numerator / denominator
