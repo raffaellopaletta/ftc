@@ -1,5 +1,5 @@
 from typing import List
-from collections import defaultdict
+from collections import defaultdict, Counter
 from .FuzzySet import FuzzySet
 from .Tnorm import Tnorm
 from .Snorm import Snorm
@@ -56,20 +56,10 @@ class TextClassifier:
     @staticmethod
     def fuzzyfy(words: List[str]) -> FuzzySet:
 
-        terms = {}
-
-        for word in words:
-            try:
-                terms[word] += 1
-            except KeyError:
-                terms[word] = 1
-
-        maximum_key = max(terms, key=terms.get)
-        maximum_value = terms[maximum_key]
-
-        for term in terms:
-            terms[term] = round(terms.get(term) / maximum_value, 2)
-
+        c = Counter(words)
+        maximum_value = c.most_common(1)[0][1]
+        d = dict(c)
+        terms = {k:round(d[k]/maximum_value,2) for k in d}
         return FuzzySet(terms)
 
     def __dist(self, term: str, category: str):
@@ -78,11 +68,17 @@ class TextClassifier:
         denominators = []
 
         for doc in self.documents[category]:
-            numerators.append(doc.terms.get(term, 0))
+            try:
+                numerators.append(doc.terms[term])
+            except KeyError:
+                pass
 
         for docs in self.documents.values():
             for doc in docs:
-                denominators.append(doc.terms.get(term, 0))
+                try:
+                    denominators.append(doc.terms[term])
+                except KeyError:
+                    pass
 
         try:
             return sum(numerators)/sum(denominators)
