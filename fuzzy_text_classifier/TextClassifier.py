@@ -26,7 +26,6 @@ class TextClassifier:
         self.documents[category].append(fs)
 
     def classify(self, text: str) -> []:
-
         fs = self.fuzzyfy(self.tokenize(text))
 
         similarities = {cat: self.similarity(fs, cat) for cat in self.documents.keys()}
@@ -60,7 +59,8 @@ class TextClassifier:
         denominators = []
 
         for docs in self.documents.values():
-            denominators = [doc.terms[term] for doc in docs]
+            for doc in docs:
+                denominators.append(doc.terms[term])
 
         try:
             return sum(numerators)/sum(denominators)
